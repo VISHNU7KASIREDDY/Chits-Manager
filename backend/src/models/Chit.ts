@@ -27,7 +27,13 @@ const monthSchema = new Schema<IMonth>({
   },
   bonusPerMember: Number,
   payments: [monthlyPaymentSchema],
-  finalChitAmount:Number
+  finalChitAmount:Number,
+  auctionParticipants: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 })
 
 const chitSchema = new Schema<IChit>(
@@ -42,13 +48,11 @@ const chitSchema = new Schema<IChit>(
     startDate: {
       type: Date,
       required: true,
-      index: true,
     },
 
     endDate: {
       type: Date,
       required: true,
-      index: true,
     },
 
     members: [
@@ -59,6 +63,13 @@ const chitSchema = new Schema<IChit>(
     ],
 
     months: [monthSchema],
+
+    liftedMembers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
 
     status: {
       type: String,

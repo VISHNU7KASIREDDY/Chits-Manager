@@ -4,7 +4,7 @@ import AdminChitController from '../controllers/adminChitController'
 import AuthMiddleware from '../middlewares/authMiddleware'
 
 class AdminChitRoutes implements Routes{
-  path:string='admin/chits'
+  path:string='/admin/chits/'
   router:Router=Router()
   public authMiddleware=new AuthMiddleware()
   public adminChitController=new AdminChitController()
@@ -15,6 +15,7 @@ class AdminChitRoutes implements Routes{
 
   initializeRoutes(){
     this.router.get(this.path,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.getAllChits)
+    this.router.get(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.getChitById)
     this.router.post(this.path,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.createChit)
     this.router.put(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.editChit)
     this.router.delete(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.deleteChit)
@@ -23,7 +24,10 @@ class AdminChitRoutes implements Routes{
     this.router.delete(`${this.path}:id/months`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.deleteMonthData)
     this.router.post(`${this.path}:id/members`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.addMembers)
     this.router.delete(`${this.path}:id/members/:memberId`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.deleteMember)
+    this.router.put(`${this.path}:id/months/payments/mark-all-paid`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.markAllPaid)
     this.router.put(`${this.path}:id/months/payments`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.editPaymentStatusOfMember)
+    this.router.put(`${this.path}:id/lifted/:memberId`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.toggleLiftedMember)
+    this.router.post(`${this.path}:id/months/send-reminders`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.sendAuctionReminders)
   }
 }
 

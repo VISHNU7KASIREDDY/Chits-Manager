@@ -3,12 +3,12 @@ import Routes from '../utils/interfaces/routes.interface'
 import AdminUserController from '../controllers/adminUserController'
 import AuthMiddleware from '../middlewares/authMiddleware'
 class AdminUserRoutes implements Routes{
-  path:string='admin/users'
+  path:string='/admin/users/'
   router:Router=Router()
   public adminUserController=new AdminUserController()
   public authMiddleware=new AuthMiddleware()
 
-  contructor(){
+  constructor(){
     this.initializeRoutes()
   }
 

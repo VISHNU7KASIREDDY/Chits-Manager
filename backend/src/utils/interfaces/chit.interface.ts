@@ -13,6 +13,7 @@ export interface IMonth {
   bonusPerMember?: number
   payments: IMonthlyPayment[]
   finalChitAmount?:number
+  auctionParticipants: Types.ObjectId[]
 }
 
 export type ChitStatus = "active" | "completed"
@@ -27,6 +28,7 @@ export interface IChit extends Document {
   endDate: Date
   members: Types.ObjectId[]
   months: IMonth[]
+  liftedMembers: Types.ObjectId[]
   status: ChitStatus
   createdAt: Date
   updatedAt: Date

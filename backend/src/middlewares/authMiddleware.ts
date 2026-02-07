@@ -20,22 +20,22 @@ class AuthMiddleware{
         token=authHeader.split(" ")[1]
         const decoded =jwt.verify(token,process.env.JWT_SECRET!) as CustomJwtPayload
 
-        req.user=await User.findById(decoded.user.id).select('-password') 
+        ;(req as any).user=await User.findById(decoded.user.id).select('-password') 
         next()
       } catch (error) {
         console.error("Token verification failed",error)
-        res.status(401).json({message:"Not authorized , token Failed"})
+        return res.status(401).json({message:"Not authorized , token Failed"})
       }
     }else{
-      res.status(401).json({message:"Not Authorized , no token provided"})
+      return res.status(401).json({message:"Not Authorized , no token provided"})
     }
   }
 
   public admin=async (req:Request,res:Response,next:NextFunction)=>{
-    if (req.user && req.user.role === 'admin') {
+    if ((req as any).user && (req as any).user.role === 'admin') {
       next();
     } else {
-      res.status(401).json({ message: 'Not authorized as an admin' });
+      return res.status(403).json({message:'Not authorized as an admin'});
     }
   }
 }

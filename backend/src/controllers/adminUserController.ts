@@ -3,10 +3,10 @@ import User from '../models/User'
 class AdminUserController{
   public getAllUsers=async (req:Request,res:Response)=>{
     try {
-      const users=await User.find()
+      const users=await User.find().select('-password')
       res.status(200).json(users)
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return res.status(500).json({message:"Server Error"})
     }
   }
@@ -27,7 +27,7 @@ class AdminUserController{
       await user.save()
       res.status(201).json({message:"User created successfully",user})
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return res.status(500).json({message:"Server Error"})
     }
   }
@@ -46,9 +46,9 @@ class AdminUserController{
         user.role=role||user.role
       }
       const updatedUser=await user.save()
-      res.status(201).json({message:"User updated user",user:updatedUser})
+      res.status(200).json({message:"User updated successfully",user:updatedUser})
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return res.status(500).json({message:"Server Error"})
     }
   }
@@ -64,7 +64,7 @@ class AdminUserController{
         res.status(200).json({message:"User deleted Successfully"})
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return res.status(500).json({message:"Server Error"})
     }
   }

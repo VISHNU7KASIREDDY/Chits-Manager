@@ -20,7 +20,7 @@ class UserController{
           user:{
             _id:user._id,
             name:user.name,
-            phone:user.name,
+            phone:user.phone,
             role:user.role
           },
           token
@@ -28,20 +28,24 @@ class UserController{
       })
 
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return res.status(500).json({message:"Server Error"})
     }
   }
   public login=async (req:Request,res:Response)=>{
 
   try{
-    const {email,password}=req.body
-    let user=await User.findOne({email})
+    const {phone,password}=req.body
+    console.log('Login attempt:', { phone, passwordProvided: !!password }); // DEBUG
+
+    let user=await User.findOne({phone})
+    console.log('User found:', user ? { id: user._id, role: user.role, phone: user.phone } : 'No user found'); // DEBUG
 
     if (!user){
       return res.status(400).json({message:"Invalid Credentials"})
     }
     const isMatch=await user.matchPassword(password)
+    console.log('Password match:', isMatch); // DEBUG
 
     if (!isMatch){
       return res.status(400).json({message:"Invalid Credentials"})
@@ -64,14 +68,23 @@ class UserController{
     })
   }catch(error){
       console.error(error)
-      res.status(500).send('Server error')
+      return res.status(500).json({message:"Server Error"})
   }
   }
   public profile=async (req:Request,res:Response)=>{
-    res.json(req.user)
+    res.json((req as any).user)
   }
   public admin=async (req:Request,res:Response)=>{
-    res.json(req.user)
+    res.json((req as any).user)
+  }
+  public getAllUsers=async (req:Request,res:Response)=>{
+    try {
+      const users=await User.find().select("-password")
+      res.status(200).json(users)
+    } catch (error) {
+       console.error(error)
+       return res.status(500).json({message:"Server Error"})
+    }
   }
 }
 

@@ -70,6 +70,9 @@ class UserController{
   public profile=async (req:Request,res:Response)=>{
     res.json(req.user)
   }
+  public admin=async (req:Request,res:Response)=>{
+    res.json(req.user)
+  }
 }
 
 export default UserController;

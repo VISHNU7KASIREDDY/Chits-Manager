@@ -21,3 +21,5 @@ class AdminChitRoutes implements Routes{
     this.router.delete(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.deleteChit)
   }
 }
+
+export default AdminChitRoutes;

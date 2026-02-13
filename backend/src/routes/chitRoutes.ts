@@ -17,5 +17,6 @@ class ChitRoutes implements Routes{
     this.router.get(`${this.path}:id`,this.authMiddleware.protect,this.chitController.getChitById)
   }
   
-
 }
+
+export default ChitRoutes;

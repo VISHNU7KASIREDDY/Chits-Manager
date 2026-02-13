@@ -1,0 +1,153 @@
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(226, 232, 240, 0.6);
+  display: flex;
+  flex-direction: column;
+  z-index: 30;
+  transition: width 0.3s ease;
+}
+
+.sidebar-brand {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sidebar-logo {
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.sidebar-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--slate-900);
+  letter-spacing: -0.5px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 0;
+  color: var(--slate-500);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-right: 3px solid transparent;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-link:hover {
+  color: var(--primary);
+}
+
+.sidebar-link .material-icons-round {
+  font-size: 20px;
+}
+
+.sidebar-link-label {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid var(--slate-100);
+}
+
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-top: 8px;
+}
+
+.sidebar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--slate-500);
+}
+
+.sidebar-avatar .material-icons-round {
+  font-size: 18px;
+}
+
+.sidebar-user-info {
+  overflow: hidden;
+}
+
+.sidebar-user-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--slate-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+  font-size: 10px;
+  color: var(--slate-500);
+}
+
+@media (max-width: 1024px) {
+  .sidebar-link-label,
+  .sidebar-name,
+  .sidebar-user-info {
+    display: none;
+  }
+
+  .sidebar-brand {
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .sidebar-link {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .sidebar-profile {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}

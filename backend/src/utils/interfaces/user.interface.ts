@@ -9,4 +9,5 @@ export interface IUser extends Document {
   role: UserRole
   createdAt: Date
   updatedAt: Date
+  matchPassword(enteredPassword: string): Promise<boolean>;
 }

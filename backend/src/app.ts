@@ -1,15 +1,16 @@
 import express from "express"
-
+import Routes from './utils/interfaces/routes.interface'
 import {connect} from "mongoose"
 
 class App{
   public app:express.Application
   public port:string|number
 
-  constructor(){
+  constructor(routes:Routes[]){
     this.app=express()
     this.port=3000
     this.initializeMiddlewares()
+    this.initializeRoutes(routes)
     this.connectDatabase()
   }
 
@@ -21,6 +22,12 @@ class App{
 
   private initializeMiddlewares() {
     this.app.use(express.json())
+  }
+
+  private initializeRoutes(routes:Routes[]){
+    routes.forEach((route) => {
+      this.app.use("/", route.router)
+    })
   }
 
   private async connectDatabase() {

@@ -1,6 +1,7 @@
 import App from "./app"
 import "dotenv/config"
-
-const app = new App()
+import UserRoutes from "./routes/userRoutes"
+const userRoutes=new UserRoutes()
+const app = new App([userRoutes])
 
 app.startServer()

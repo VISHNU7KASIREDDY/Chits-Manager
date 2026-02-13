@@ -61,7 +61,7 @@ class AdminUserController{
         return res.status(404).json({message:"User not found"})
       }else{
         await user.deleteOne()
-        res.status(201).json({message:"User deleted Successfully"})
+        res.status(200).json({message:"User deleted Successfully"})
       }
     } catch (error) {
       console.log(error)

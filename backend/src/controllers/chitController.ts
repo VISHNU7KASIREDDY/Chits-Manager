@@ -1,7 +1,7 @@
 import { Request,Response } from "express-serve-static-core";
 import Chit from '../models/Chit'
 class ChitController{
-  public getAllChits=async (req:Request,res:Response)=>{
+  public getMyChits=async (req:Request,res:Response)=>{
     try {
       if (!req.user) {
         return res.status(401).json({ message: "Not authorized" });

@@ -1,7 +1,8 @@
 import {Router} from 'express'
+import Routes from '../utils/interfaces/routes.interface'
 import UserController from '../controllers/userController' 
 import AuthMiddleware from '../middlewares/authMiddleware'
-class UserRoutes {
+class UserRoutes implements Routes{
   path:string='/'
   router:Router=Router()
   public userController=new UserController()

@@ -73,4 +73,6 @@ chitSchema.index({ members: 1 })
 chitSchema.index({ startDate: 1 })
 chitSchema.index({ endDate: 1 })
 
-export const Chit = mongoose.model<IChit>("Chit", chitSchema)
+const Chit = mongoose.model<IChit>("Chit", chitSchema)
+
+export default Chit;

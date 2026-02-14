@@ -4,7 +4,7 @@ import AdminChitController from '../controllers/adminChitController'
 import AuthMiddleware from '../middlewares/authMiddleware'
 
 class AdminChitRoutes implements Routes{
-  path:string='/chits'
+  path:string='admin/chits'
   router:Router=Router()
   public authMiddleware=new AuthMiddleware()
   public adminChitController=new AdminChitController()

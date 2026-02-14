@@ -12,6 +12,7 @@ export interface IMonth {
   winner?: Types.ObjectId
   bonusPerMember?: number
   payments: IMonthlyPayment[]
+  finalChitAmount?:number
 }
 
 export type ChitStatus = "active" | "completed"

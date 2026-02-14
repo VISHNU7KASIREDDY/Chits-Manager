@@ -27,6 +27,7 @@ const monthSchema = new Schema<IMonth>({
   },
   bonusPerMember: Number,
   payments: [monthlyPaymentSchema],
+  finalChitAmount:Number
 })
 
 const chitSchema = new Schema<IChit>(

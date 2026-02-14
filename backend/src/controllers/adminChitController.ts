@@ -63,25 +63,61 @@ class AdminChitController{
       return res.status(500).json({message:"Server Error"})
     }
   }
-  public addMonthData=async (req:Request,res:Response)=>{
+  public addMonthData = async (req: Request, res: Response) => {
     try {
-      const {chitId}=req.params
-      const {monthNumber,auctionAmount,winner}=req.body
-      let chit=await Chit.findById(chitId)
-      if (!chit){
-        return res.status(404).json({message:"Chit not found"})
+      const { chitId } = req.params;
+      const { monthNumber, auctionAmount, winner } = req.body;
+  
+      if (!monthNumber || typeof monthNumber !== "number") {
+        return res.status(400).json({ message: "monthNumber is required" });
       }
-      let bonusPerMember=Math.round(auctionAmount/chit.totalMembers)
-      let finalChitAmount=chit.monthlyAmount-bonusPerMember
-
-      chit.months.push({monthNumber,auctionAmount,winner,bonusPerMember,finalChitAmount,payments: [] as IMonthlyPayment[]})
-      await chit.save()
-      res.status(200).json(chit)
+  
+      const chit = await Chit.findById(chitId);
+  
+      if (!chit) {
+        return res.status(404).json({ message: "Chit not found" });
+      }
+  
+      const monthExists = chit.months.some(
+        (m) => m.monthNumber === monthNumber
+      );
+  
+      if (monthExists) {
+        return res.status(400).json({ message: "Month already exists" });
+      }
+  
+      const bonusPerMember = Math.round(
+        auctionAmount / chit.totalMembers
+      );
+  
+      const finalChitAmount = chit.monthlyAmount - bonusPerMember;
+  
+      const payments: IMonthlyPayment[] = chit.members.map((member) => ({
+        member,
+        isPaid: false
+      }));
+  
+      chit.months.push({
+        monthNumber,
+        auctionAmount,
+        winner,
+        bonusPerMember,
+        finalChitAmount,
+        payments
+      });
+  
+      await chit.save();
+  
+      return res.status(201).json({
+        message: "Month added successfully",
+        chit
+      });
     } catch (error) {
-      console.log(error)
-      return res.status(500).json({message:"Server Error"})
+      console.log(error);
+      return res.status(500).json({ message: "Server Error" });
     }
-  }
+  };
+  
   public editMonthData=async (req:Request,res:Response)=>{
     try {
       const {chitId}=req.params
@@ -144,13 +180,27 @@ class AdminChitController{
     try {
       const {chitId}=req.params
       const {members}=req.body
-      let chit=await Chit.findById(chitId)
-      if (!chit){
-        return res.status(404).json({message:"Chit not found"})
+      if (!Array.isArray(members) || members.length === 0) {
+        return res.status(400).json({ message: "Members array is required" });
       }
-      members.forEach((member : Types.ObjectId)=> {
-        chit.members.push(member)
-      });
+      const validMembers = members
+      .filter((id: string) => Types.ObjectId.isValid(id))
+      .map((id: string) => new Types.ObjectId(id));
+      
+      if (validMembers.length === 0) {
+        return res.status(400).json({ message: "No valid memberIds provided" });
+      }
+
+      const updatedChit = await Chit.findByIdAndUpdate(
+        chitId,
+        { $addToSet: { members: { $each: validMembers } } },
+        { new: true }
+      );
+
+      if (!updatedChit) {
+        return res.status(404).json({ message: "Chit not found" });
+      }
+        res.status(200).json(updatedChit)
       
     } catch (error) {
       console.log(error)
@@ -180,7 +230,55 @@ class AdminChitController{
       return res.status(500).json({message:"Server Error"})
     }
   }
-  
+  public editPaymentStatusOfMember=async (req:Request,res:Response)=>{
+    try {
+      const { chitId } = req.params
+    const { monthNumber, memberId } = req.body
+
+    if (!Types.ObjectId.isValid(memberId)) {
+      return res.status(400).json({ message: "Invalid memberId" });
+    }
+
+    if (!monthNumber || typeof monthNumber !== "number") {
+      return res.status(400).json({ message: "monthNumber is required" });
+    }
+
+    const chit = await Chit.findById(chitId);
+
+    if (!chit) {
+      return res.status(404).json({ message: "Chit not found" });
+    }
+
+    const month = chit.months.find(
+      (m) => m.monthNumber === monthNumber
+    );
+
+    if (!month) {
+      return res.status(404).json({ message: "Month not found" });
+    }
+
+    const payment = month.payments.find(
+      (p) => p.member.toString() === memberId
+    );
+
+    if (!payment) {
+      return res.status(404).json({ message: "Payment record not found" });
+    }
+
+    payment.isPaid = true;
+    payment.paidDate = new Date();
+
+    await chit.save();
+
+    return res.status(200).json({
+      message: "Payment updated successfully",
+      chit
+    });
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({message:"Server Error"})
+    }
+  }
 }
 
 export default AdminChitController;

@@ -19,9 +19,11 @@ class AdminChitRoutes implements Routes{
     this.router.put(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.editChit)
     this.router.delete(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.deleteChit)
     this.router.post(`${this.path}:id/months`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.addMonthData)
-    this.router.put(`${this.path}:id/months`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.addMonthData)
-    this.router.delete(`${this.path}:id/months`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.addMonthData)
-    
+    this.router.put(`${this.path}:id/months`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.editMonthData)
+    this.router.delete(`${this.path}:id/months`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.deleteMonthData)
+    this.router.post(`${this.path}:id/members`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.addMembers)
+    this.router.delete(`${this.path}:id/members/:memberId`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.deleteMember)
+    this.router.put(`${this.path}:id/months/payments`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminChitController.editPaymentStatusOfMember)
   }
 }
 

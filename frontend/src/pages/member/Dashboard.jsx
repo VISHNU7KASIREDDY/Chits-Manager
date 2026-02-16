@@ -11,6 +11,7 @@ export default function MemberDashboard() {
   const { user } = useAuth()
   const [chits, setChits] = useState([])
   const [loading, setLoading] = useState(true)
+  const [paymentFilter, setPaymentFilter] = useState('all')
 
   useEffect(() => {
     fetchChits()
@@ -87,6 +88,20 @@ export default function MemberDashboard() {
         setJoinLoading(false)
       })
   }
+
+  const filteredPayments = chits.flatMap(chit =>
+    (chit.months || []).map((month, idx) => ({
+      chit,
+      month,
+      idx,
+      myPayment: month.payments?.find(p => p.member === user?._id)
+    }))
+  ).filter(item => {
+    if (paymentFilter === 'all') return true
+    if (paymentFilter === 'paid') return item.myPayment?.isPaid
+    if (paymentFilter === 'pending') return !item.myPayment?.isPaid
+    return true
+  })
 
   return (
     <>
@@ -222,14 +237,16 @@ export default function MemberDashboard() {
           <div className="table-header">
             <h2 className="section-title">Monthly Payment Statement</h2>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px' }}>
-                <span className="material-icons-round" style={{ fontSize: '14px' }}>filter_list</span>
-                Filter
-              </button>
-              <button className="btn-primary" style={{ padding: '6px 12px', fontSize: '12px', boxShadow: 'none', background: 'var(--primary-light)', color: 'var(--primary)' }}>
-                <span className="material-icons-round" style={{ fontSize: '14px' }}>download</span>
-                Export PDF
-              </button>
+              <select
+                className="filter-select"
+                style={{ padding: '6px 12px', fontSize: '12px', height: 'auto', minWidth: '140px' }}
+                value={paymentFilter}
+                onChange={(e) => setPaymentFilter(e.target.value)}
+              >
+                <option value="all">All Transactions</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+              </select>
             </div>
           </div>
 
@@ -244,30 +261,26 @@ export default function MemberDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {chits.flatMap(chit =>
-                  (chit.months || []).map((month, idx) => {
-                    const myPayment = month.payments?.find(p => p.member === user?._id)
-                    return (
-                      <tr key={`${chit._id}-${idx}`}>
-                        <td>
-                          <p style={{ fontWeight: 700, color: 'var(--slate-900)' }}>{chit.name}</p>
-                          <p style={{ fontSize: '10px', color: 'var(--slate-400)' }}>Instalment {month.monthNumber}/{chit.duration}</p>
-                        </td>
-                        <td style={{ fontWeight: 600 }}>Month {month.monthNumber}</td>
-                        <td style={{ fontWeight: 700, color: 'var(--slate-900)' }}>₹{chit.monthlyAmount?.toLocaleString()}</td>
-                        <td>
-                          <span className={`badge ${myPayment?.isPaid ? 'badge-paid' : 'badge-pending'}`}>
-                            {myPayment?.isPaid ? 'PAID' : 'PENDING'}
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  })
-                )}
-                {chits.every(c => !c.months || c.months.length === 0) && (
+                {filteredPayments.length > 0 ? (
+                  filteredPayments.map(({ chit, month, idx, myPayment }) => (
+                    <tr key={`${chit._id}-${idx}`}>
+                      <td>
+                        <p style={{ fontWeight: 700, color: 'var(--slate-900)' }}>{chit.name}</p>
+                        <p style={{ fontSize: '10px', color: 'var(--slate-400)' }}>Instalment {month.monthNumber}/{chit.duration}</p>
+                      </td>
+                      <td style={{ fontWeight: 600 }}>Month {month.monthNumber}</td>
+                      <td style={{ fontWeight: 700, color: 'var(--slate-900)' }}>₹{chit.monthlyAmount?.toLocaleString()}</td>
+                      <td>
+                        <span className={`badge ${myPayment?.isPaid ? 'badge-paid' : 'badge-pending'}`}>
+                          {myPayment?.isPaid ? 'PAID' : 'PENDING'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
                     <td colSpan="4" style={{ textAlign: 'center', color: 'var(--slate-400)', padding: '40px' }}>
-                      No payment records yet.
+                      {chits.length === 0 ? 'No chits found.' : 'No matching payment records found.'}
                     </td>
                   </tr>
                 )}

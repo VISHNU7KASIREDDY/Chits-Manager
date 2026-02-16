@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import emailjs from '@emailjs/browser'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Footer from '../components/Footer'
@@ -12,9 +13,33 @@ export default function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setSubmitted(true)
-    setForm({ name: '', email: '', phone: '', message: '' })
-    setTimeout(() => setSubmitted(false), 4000)
+    
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+    if (!serviceId || !templateId || !publicKey) {
+      alert('EmailJS credentials not configured in environment variables.')
+      return
+    }
+
+    const templateParams = {
+      from_name: form.name,
+      from_email: form.email,
+      phone: form.phone,
+      message: form.message,
+      to_name: 'ChitFund Admin',
+    }
+
+    emailjs.send(serviceId, templateId, templateParams, publicKey)
+      .then((response) => {
+        setSubmitted(true)
+        setForm({ name: '', email: '', phone: '', message: '' })
+        setTimeout(() => setSubmitted(false), 4000)
+      }, (err) => {
+        console.error('FAILED...', err)
+        alert('Failed to send message. Please try again later.')
+      })
   }
 
   return (

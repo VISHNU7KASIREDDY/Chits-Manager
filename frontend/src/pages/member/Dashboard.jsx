@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import Header from '../../components/Header'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
+import Modal from '../../components/Modal'
+import emailjs from '@emailjs/browser'
 import '../Dashboard.css'
 
 export default function MemberDashboard() {
@@ -45,17 +47,53 @@ export default function MemberDashboard() {
     return Math.round((elapsed / chit.duration) * 100)
   }
 
+  const [showJoinModal, setShowJoinModal] = useState(false)
+  const [joinForm, setJoinForm] = useState({ chitValue: '', slots: 1 })
+  const [joinLoading, setJoinLoading] = useState(false)
+
+  const handleJoinSubmit = (e) => {
+    e.preventDefault()
+    
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+    if (!serviceId || !templateId || !publicKey) {
+      alert('EmailJS credentials missing in .env file')
+      return
+    }
+
+    setJoinLoading(true)
+    
+    const templateParams = {
+      from_name: user?.name || 'Member',
+      from_email: user?.email || 'N/A',
+      phone: user?.phone || 'N/A',
+      message: `NEW CHIT JOIN REQUEST\n\nChit Value: ₹${joinForm.chitValue}\nNumber of Slots: ${joinForm.slots}\n\nPlease process this request.`,
+      to_name: 'Admin',
+    }
+    
+    emailjs.send(serviceId, templateId, templateParams, publicKey)
+      .then((response) => {
+        alert('Join request sent successfully!')
+        setShowJoinModal(false)
+        setJoinForm({ chitValue: '', slots: 1 })
+      })
+      .catch((err) => {
+        console.error('EmailJS FAILED...', err)
+        alert('Failed to send request.')
+      })
+      .finally(() => {
+        setJoinLoading(false)
+      })
+  }
+
   return (
     <>
       <Header
         title="Member Overview"
         subtitle={`Welcome back, ${user?.name || 'Member'}. Here's your portfolio summary.`}
-        actions={
-          <Link to="/my-chits" className="btn-primary" style={{ padding: '10px 20px', fontSize: '13px' }}>
-            <span className="material-icons-round" style={{ fontSize: '16px' }}>add</span>
-            Join New Chit
-          </Link>
-        }
+        actions={null}
       />
 
       <div className="dashboard-content">
@@ -169,7 +207,7 @@ export default function MemberDashboard() {
                     </Link>
                   )
                 })}
-                <div className="chit-card-add">
+                <div className="chit-card-add" onClick={() => setShowJoinModal(true)} style={{ cursor: 'pointer' }}>
                   <div className="add-icon-circle">
                     <span className="material-icons-round">add</span>
                   </div>
@@ -242,6 +280,40 @@ export default function MemberDashboard() {
           </div>
         </section>
       </div>
+      <Modal isOpen={showJoinModal} onClose={() => setShowJoinModal(false)} title="Join New Chit">
+        <form onSubmit={handleJoinSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <label className="form-label">Chit Value (₹)</label>
+            <input
+              type="number"
+              required
+              min="1000"
+              placeholder="e.g. 100000"
+              className="input-field"
+              value={joinForm.chitValue}
+              onChange={e => setJoinForm({ ...joinForm, chitValue: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="form-label">Number of Slots</label>
+            <input
+              type="number"
+              required
+              min="1"
+              max="5"
+              className="input-field"
+              value={joinForm.slots}
+              onChange={e => setJoinForm({ ...joinForm, slots: e.target.value })}
+            />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '10px' }}>
+            <button type="button" onClick={() => setShowJoinModal(false)} className="btn-outline">Cancel</button>
+            <button type="submit" className="btn-primary" disabled={joinLoading}>
+              {joinLoading ? 'Sending...' : 'Send Request'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </>
   )
 }

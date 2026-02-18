@@ -7,28 +7,29 @@ This diagram captures the functional requirements of the system, categorized by 
 ---
 
 ```mermaid
-useCaseDiagram
-    actor Admin
-    actor Member
+flowchart LR
+    Admin([Admin])
+    Member([Member])
 
-    package "Chit Management System" {
-        usecase "Login / Register" as UC1
+    subgraph "Chit Management System"
+        direction TB
+        UC1(Login / Register)
         
         %% Admin Cases
-        usecase "Create New Chit" as UC_CreateChit
-        usecase "Manage Members" as UC_ManageMembers
-        usecase "Record Auction Results" as UC_RecordAuction
-        usecase "Update Payment Status" as UC_UpdatePayment
-        usecase "Close Completed Chit" as UC_CloseChit
-        usecase "View Overall Analytics" as UC_AdminStats
+        UC_CreateChit(Create New Chit)
+        UC_ManageMembers(Manage Members)
+        UC_RecordAuction(Record Auction Results)
+        UC_UpdatePayment(Update Payment Status)
+        UC_CloseChit(Close Completed Chit)
+        UC_AdminStats(View Overall Analytics)
         
         %% Member Cases
-        usecase "View My Chits" as UC_ViewChits
-        usecase "Check Payment History" as UC_CheckHistory
-        usecase "View Upcoming Dues" as UC_CheckDues
-        usecase "Update Profile" as UC_UpdateProfile
-        usecase "Receive Notifications" as UC_Notifications
-    }
+        UC_ViewChits(View My Chits)
+        UC_CheckHistory(Check Payment History)
+        UC_CheckDues(View Upcoming Dues)
+        UC_UpdateProfile(Update Profile)
+        UC_Notifications(Receive Notifications)
+    end
 
     Admin --> UC1
     Member --> UC1
@@ -47,8 +48,12 @@ useCaseDiagram
     Member --> UC_Notifications
     
     %% Relationships
-    UC_RecordAuction ..> UC_Notifications : <<triggers>>
-    UC_UpdatePayment ..> UC_CheckDues : <<updates>>
+    UC_RecordAuction -.->|triggers| UC_Notifications
+    UC_UpdatePayment -.->|update| UC_CheckDues
+
+    %% Styling for Actors
+    style Admin fill:#f9f,stroke:#333,stroke-width:2px
+    style Member fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
 ---

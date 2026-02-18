@@ -1,6 +1,8 @@
 import express from "express"
+import cors from "cors"
 import Routes from './utils/interfaces/routes.interface'
 import {connect} from "mongoose"
+import NotificationRoutes from './routes/notificationRoutes'
 
 class App{
   public app:express.Application
@@ -8,9 +10,10 @@ class App{
 
   constructor(routes:Routes[]){
     this.app=express()
-    this.port=3000
+    this.port=process.env.PORT||3000
     this.initializeMiddlewares()
-    this.initializeRoutes(routes)
+    const allRoutes = [...routes, new NotificationRoutes()];
+    this.initializeRoutes(allRoutes)
     this.connectDatabase()
   }
 
@@ -21,6 +24,7 @@ class App{
   }
 
   private initializeMiddlewares() {
+    this.app.use(cors())
     this.app.use(express.json())
   }
 
@@ -31,10 +35,15 @@ class App{
   }
 
   private async connectDatabase() {
-    const uri = process.env.MONGODB_URI
+    let uri = process.env.MONGODB_URI
     if (!uri) {
       throw new Error("MONGODB_URI is missing in environment variables")
     }
+
+    if (!uri.includes('mongodb.net/chits')) {
+          uri = uri.replace('mongodb.net/', 'mongodb.net/chitsdb')
+    }
+
     try {
       await connect(uri)
       console.log("Database connected...")

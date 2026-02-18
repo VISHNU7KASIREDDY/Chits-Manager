@@ -7,7 +7,7 @@ This diagram captures the functional requirements of the system, categorized by 
 ---
 
 ```mermaid
-usecaseDiagram
+useCaseDiagram
     actor Admin
     actor Member
 

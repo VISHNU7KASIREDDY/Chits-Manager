@@ -117,4 +117,4 @@ After running `npm run seed`:
 
 | Role   | Phone        | Password   |
 | ------ | ------------ | ---------- |
-| Admin  | 1234567890   | admin123   |
+| Admin  | 1000000001   | admin123   |

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { Navigate } from 'react-router-dom'
 import Footer from '../components/Footer'
 import Modal from '../components/Modal'
+import LoadingScreen from '../components/LoadingScreen'
 import emailjs from '@emailjs/browser'
 import { useState, useEffect } from 'react'
 import './Landing.css'
@@ -81,7 +82,7 @@ export default function Landing() {
     navigate('/login')
   }
 
-  if (loading) return null
+  if (loading) return <LoadingScreen />
   if (user && user.role !== 'viewer') return <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace />
 
   const isViewer = user?.role === 'viewer'

@@ -28,7 +28,7 @@ const notificationSchema = new Schema<INotification>(
   },
   { timestamps: true }
 )
-
+notificationSchema.index({ type: 1 })
 notificationSchema.index({ toUser: 1, isRead: 1 })
 notificationSchema.index({ createdAt: -1 })
 

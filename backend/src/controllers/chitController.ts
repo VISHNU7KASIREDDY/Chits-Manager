@@ -38,6 +38,9 @@ class ChitController{
     try {
       const { id: chitId } = req.params
       const { monthNumber } = req.body
+      if (!req.user) {
+        return res.status(401).json({ message: "Not authorized" })
+      }
       const userId = req.user._id
       const userName = req.user.name
 

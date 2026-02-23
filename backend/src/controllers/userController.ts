@@ -35,42 +35,42 @@ class UserController{
   }
   public login=async (req:Request,res:Response)=>{
 
-  try{
-    const {phone,password}=req.body
-    console.log('Login attempt:', { phone, passwordProvided: !!password }); // DEBUG
+    try{
+      const {phone,password}=req.body
+      console.log('Login attempt:', { phone, passwordProvided: !!password }); // DEBUG
 
-    let user=await User.findOne({phone})
-    console.log('User found:', user ? { id: user._id, role: user.role, phone: user.phone } : 'No user found'); // DEBUG
+      let user=await User.findOne({phone})
+      console.log('User found:', user ? { id: user._id, role: user.role, phone: user.phone } : 'No user found'); // DEBUG
 
-    if (!user){
-      return res.status(400).json({message:"Invalid Credentials"})
-    }
-    const isMatch=await user.matchPassword(password)
-    console.log('Password match:', isMatch); // DEBUG
+      if (!user){
+        return res.status(400).json({message:"Invalid Credentials"})
+      }
+      const isMatch=await user.matchPassword(password)
+      console.log('Password match:', isMatch); // DEBUG
 
-    if (!isMatch){
-      return res.status(400).json({message:"Invalid Credentials"})
-    }
+      if (!isMatch){
+        return res.status(400).json({message:"Invalid Credentials"})
+      }
 
-    const payload={user:{id:user._id,role:user.role}};
+      const payload={user:{id:user._id,role:user.role}};
 
-    jwt.sign(payload,process.env.JWT_SECRET!,{expiresIn:"48h"},(error,token)=>{
-      if (error) throw error
+      jwt.sign(payload,process.env.JWT_SECRET!,{expiresIn:"48h"},(error,token)=>{
+        if (error) throw error
 
-      res.json({
-        user:{
-          _id:user._id,
-          name:user.name,
-          phone:user.phone,
-          role:user.role
-        },
-        token,
+        res.json({
+          user:{
+            _id:user._id,
+            name:user.name,
+            phone:user.phone,
+            role:user.role
+          },
+          token,
+        })
       })
-    })
-  }catch(error){
-      console.error(error)
-      return res.status(500).json({message:"Server Error"})
-  }
+    }catch(error){
+        console.error(error)
+        return res.status(500).json({message:"Server Error"})
+    }
   }
   public profile=async (req:AuthRequest,res:Response)=>{
     res.json(req.user)

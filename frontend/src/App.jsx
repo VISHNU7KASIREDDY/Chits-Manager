@@ -18,11 +18,12 @@ import Notifications from './pages/admin/Notifications'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Profile from './pages/Profile'
+import LoadingScreen from './components/LoadingScreen'
 
 function ProtectedRoute({ allowedRoles }) {
   const { user, loading } = useAuth()
 
-  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'var(--font)', color: 'var(--slate-500)' }}>Loading...</div>
+  if (loading) return <LoadingScreen />
   if (!user) return <Navigate to="/login" replace />
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     if (user.role === 'admin') return <Navigate to="/admin" replace />
@@ -36,7 +37,7 @@ function ProtectedRoute({ allowedRoles }) {
 function AuthRedirect({ children }) {
   const { user, loading } = useAuth()
 
-  if (loading) return null
+  if (loading) return <LoadingScreen />
   if (user) {
     if (user.role === 'admin') return <Navigate to="/admin" replace />
     if (user.role === 'viewer') return <Navigate to="/" replace />

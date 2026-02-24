@@ -7,7 +7,7 @@ import './Landing.css'
 
 export default function Contact() {
   const { user } = useAuth()
-  const dashboardPath = user?.role === 'admin' ? '/admin' : '/dashboard'
+  const dashboardPath = user?.role === 'admin' ? '/admin' : user?.role === 'viewer' ? '/' : '/dashboard'
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
 

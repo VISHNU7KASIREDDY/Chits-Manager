@@ -1,13 +1,19 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Navigate } from 'react-router-dom'
 import Footer from '../components/Footer'
+import Modal from '../components/Modal'
+import emailjs from '@emailjs/browser'
 import { useState, useEffect } from 'react'
 import './Landing.css'
 
 export default function Landing() {
-  const { user, loading } = useAuth()
+  const { user, loading, logout } = useAuth()
+  const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
+  const [showJoinModal, setShowJoinModal] = useState(false)
+  const [joinForm, setJoinForm] = useState({ chitValue: '', slots: 1 })
+  const [joinLoading, setJoinLoading] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,8 +39,52 @@ export default function Landing() {
     }
   }, [loading])
 
+  const handleJoinSubmit = (e) => {
+    e.preventDefault()
+
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+    if (!serviceId || !templateId || !publicKey) {
+      alert('EmailJS credentials missing in .env file')
+      return
+    }
+
+    setJoinLoading(true)
+
+    const templateParams = {
+      from_name: user?.name || 'Viewer',
+      from_email: user?.email || 'N/A',
+      phone: user?.phone || 'N/A',
+      message: `NEW CHIT JOIN REQUEST\n\nChit Value: ₹${joinForm.chitValue}\nNumber of Slots: ${joinForm.slots}\n\nPlease process this request.`,
+      to_name: 'Admin',
+    }
+
+    emailjs.send(serviceId, templateId, templateParams, publicKey)
+      .then(() => {
+        alert('Join request sent successfully!')
+        setShowJoinModal(false)
+        setJoinForm({ chitValue: '', slots: 1 })
+      })
+      .catch((err) => {
+        console.error('EmailJS FAILED...', err)
+        alert('Failed to send request.')
+      })
+      .finally(() => {
+        setJoinLoading(false)
+      })
+  }
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
   if (loading) return null
-  if (user) return <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace />
+  if (user && user.role !== 'viewer') return <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace />
+
+  const isViewer = user?.role === 'viewer'
 
   return (
     <div className="landing-page">
@@ -53,12 +103,23 @@ export default function Landing() {
           <Link to="/contact">
             <button className="landing-btn-ghost">Contact</button>
           </Link>
-          <Link to="/login">
-            <button className="landing-btn-ghost">Sign In</button>
-          </Link>
-          <Link to="/register">
-            <button className="landing-btn-solid">Get Started</button>
-          </Link>
+          {isViewer ? (
+            <>
+              <Link to="/profile">
+                <button className="landing-btn-ghost">Profile</button>
+              </Link>
+              <button className="landing-btn-ghost" onClick={handleLogout}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <button className="landing-btn-ghost">Sign In</button>
+              </Link>
+              <Link to="/register">
+                <button className="landing-btn-solid">Get Started</button>
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -79,18 +140,27 @@ export default function Landing() {
             </p>
 
             <div className="landing-hero-buttons">
-              <Link to="/register">
-                <button className="landing-hero-btn-primary">
+              {isViewer ? (
+                <button className="landing-hero-btn-primary" onClick={() => setShowJoinModal(true)}>
                   Join a New Group
                   <span className="material-icons-round" style={{ fontSize: '20px' }}>arrow_forward</span>
                 </button>
-              </Link>
-              <Link to="/login">
-                <button className="landing-hero-btn-outline">
-                  <span className="material-icons-round" style={{ fontSize: '20px' }}>login</span>
-                  Sign In
-                </button>
-              </Link>
+              ) : (
+                <Link to="/register">
+                  <button className="landing-hero-btn-primary">
+                    Join a New Group
+                    <span className="material-icons-round" style={{ fontSize: '20px' }}>arrow_forward</span>
+                  </button>
+                </Link>
+              )}
+              {!isViewer && (
+                <Link to="/login">
+                  <button className="landing-hero-btn-outline">
+                    <span className="material-icons-round" style={{ fontSize: '20px' }}>login</span>
+                    Sign In
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -253,17 +323,59 @@ export default function Landing() {
             <p className="landing-cta-subtitle">
               Join thousands of groups already managing their chit funds digitally.
             </p>
-            <Link to="/register">
-              <button className="landing-cta-btn">
-                Start Your Free Account
+            {isViewer ? (
+              <button className="landing-cta-btn" onClick={() => setShowJoinModal(true)}>
+                Join a New Group
                 <span className="material-icons-round" style={{ fontSize: '20px' }}>arrow_forward</span>
               </button>
-            </Link>
+            ) : (
+              <Link to="/register">
+                <button className="landing-cta-btn">
+                  Start Your Free Account
+                  <span className="material-icons-round" style={{ fontSize: '20px' }}>arrow_forward</span>
+                </button>
+              </Link>
+            )}
             <span className="material-icons-round landing-cta-watermark">account_balance</span>
           </div>
         </section>
       </main>
       <Footer />
+
+      <Modal isOpen={showJoinModal} onClose={() => setShowJoinModal(false)} title="Join New Chit">
+        <form onSubmit={handleJoinSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <label className="form-label">Chit Value (₹)</label>
+            <input
+              type="number"
+              required
+              min="1000"
+              placeholder="e.g. 100000"
+              className="input-field"
+              value={joinForm.chitValue}
+              onChange={e => setJoinForm({ ...joinForm, chitValue: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="form-label">Number of Slots</label>
+            <input
+              type="number"
+              required
+              min="1"
+              max="5"
+              className="input-field"
+              value={joinForm.slots}
+              onChange={e => setJoinForm({ ...joinForm, slots: e.target.value })}
+            />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '10px' }}>
+            <button type="button" onClick={() => setShowJoinModal(false)} className="btn-outline">Cancel</button>
+            <button type="submit" className="btn-primary" disabled={joinLoading}>
+              {joinLoading ? 'Sending...' : 'Send Request'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

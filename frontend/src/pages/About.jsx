@@ -5,7 +5,7 @@ import './Landing.css'
 
 export default function About() {
   const { user } = useAuth()
-  const dashboardPath = user?.role === 'admin' ? '/admin' : '/dashboard'
+  const dashboardPath = user?.role === 'admin' ? '/admin' : user?.role === 'viewer' ? '/' : '/dashboard'
 
   return (
     <div className="landing-page">

@@ -6,6 +6,7 @@ export default function Sidebar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const isAdmin = user?.role === 'admin'
+  const isViewer = user?.role === 'viewer'
 
   const handleLogout = () => {
     logout()
@@ -31,7 +32,14 @@ export default function Sidebar() {
     { path: '/contact', icon: 'mail', label: 'Contact' },
   ]
 
-  const links = isAdmin ? adminLinks : memberLinks
+  const viewerLinks = [
+    { path: '/', icon: 'home', label: 'Home' },
+    { path: '/about', icon: 'info', label: 'About Us' },
+    { path: '/contact', icon: 'mail', label: 'Contact' },
+    { path: '/profile', icon: 'person', label: 'Profile' },
+  ]
+
+  const links = isAdmin ? adminLinks : isViewer ? viewerLinks : memberLinks
 
   return (
     <aside className="sidebar">
@@ -47,7 +55,7 @@ export default function Sidebar() {
           <NavLink
             key={link.path}
             to={link.path}
-            end={link.path === '/admin' || link.path === '/dashboard'}
+            end={link.path === '/admin' || link.path === '/dashboard' || link.path === '/'}
             className={({ isActive }) =>
               `sidebar-link ${isActive ? 'sidebar-item-active' : ''}`
             }
@@ -69,7 +77,7 @@ export default function Sidebar() {
           </div>
           <div className="sidebar-user-info">
             <p className="sidebar-user-name">{user?.name || 'User'}</p>
-            <p className="sidebar-user-role">{isAdmin ? 'Admin' : 'Member'}</p>
+            <p className="sidebar-user-role">{isAdmin ? 'Admin' : isViewer ? 'Viewer' : 'Member'}</p>
           </div>
         </Link>
       </div>

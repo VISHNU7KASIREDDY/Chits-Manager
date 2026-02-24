@@ -25,7 +25,9 @@ function ProtectedRoute({ allowedRoles }) {
   if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'var(--font)', color: 'var(--slate-500)' }}>Loading...</div>
   if (!user) return <Navigate to="/login" replace />
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace />
+    if (user.role === 'admin') return <Navigate to="/admin" replace />
+    if (user.role === 'viewer') return <Navigate to="/" replace />
+    return <Navigate to="/dashboard" replace />
   }
 
   return <Outlet />
@@ -35,7 +37,11 @@ function AuthRedirect({ children }) {
   const { user, loading } = useAuth()
 
   if (loading) return null
-  if (user) return <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace />
+  if (user) {
+    if (user.role === 'admin') return <Navigate to="/admin" replace />
+    if (user.role === 'viewer') return <Navigate to="/" replace />
+    return <Navigate to="/dashboard" replace />
+  }
   return children
 }
 
@@ -50,7 +56,7 @@ export default function App() {
             <Route path="/login" element={<AuthRedirect><Login /></AuthRedirect>} />
             <Route path="/register" element={<AuthRedirect><Register /></AuthRedirect>} />
 
-            <Route element={<ProtectedRoute allowedRoles={['member', 'viewer']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['member']} />}>
               <Route element={<DashboardLayout />}>
                 <Route path="/dashboard" element={<MemberDashboard />} />
                 <Route path="/my-chits" element={<MyChits />} />

@@ -25,7 +25,7 @@ export default function Header({ title, subtitle, actions }) {
       <div className="header-actions">
         <button className="notification-btn" onClick={handleNotificationClick}>
           <span className="material-icons-round">notifications</span>
-          {unreadCount > 0 && <span className="notification-dot"></span>}
+          {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
         </button>
         {actions}
       </div>

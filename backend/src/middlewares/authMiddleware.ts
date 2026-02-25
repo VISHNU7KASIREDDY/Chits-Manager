@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import User from '../models/User'
-import { Request,Response,NextFunction } from 'express'
+import { Response,NextFunction } from 'express'
+import { AuthRequest } from "../utils/interfaces/authRequest.interface"
 
 import { JwtPayload } from "jsonwebtoken";
 
@@ -12,7 +13,7 @@ interface CustomJwtPayload extends JwtPayload {
 
 
 class AuthMiddleware{
-  public protect =async (req:Request,res:Response,next:NextFunction)=>{
+  public protect =async (req:AuthRequest,res:Response,next:NextFunction)=>{
     let token
     let authHeader=req.headers.authorization
     if (authHeader&& authHeader.startsWith('Bearer')){
@@ -20,7 +21,7 @@ class AuthMiddleware{
         token=authHeader.split(" ")[1]
         const decoded =jwt.verify(token,process.env.JWT_SECRET!) as CustomJwtPayload
 
-        ;(req as any).user=await User.findById(decoded.user.id).select('-password') 
+        req.user=await User.findById(decoded.user.id).select('-password') as any
         next()
       } catch (error) {
         console.error("Token verification failed",error)
@@ -31,8 +32,8 @@ class AuthMiddleware{
     }
   }
 
-  public admin=async (req:Request,res:Response,next:NextFunction)=>{
-    if ((req as any).user && (req as any).user.role === 'admin') {
+  public admin=async (req:AuthRequest,res:Response,next:NextFunction)=>{
+    if (req.user && req.user.role === 'admin') {
       next();
     } else {
       return res.status(403).json({message:'Not authorized as an admin'});

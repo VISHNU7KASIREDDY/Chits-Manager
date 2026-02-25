@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import User from '../models/User'
 import jwt from "jsonwebtoken"
+import { AuthRequest } from "../utils/interfaces/authRequest.interface";
 
 class UserController{
   public register=async(req:Request,res:Response)=>{
@@ -71,11 +72,11 @@ class UserController{
       return res.status(500).json({message:"Server Error"})
   }
   }
-  public profile=async (req:Request,res:Response)=>{
-    res.json((req as any).user)
+  public profile=async (req:AuthRequest,res:Response)=>{
+    res.json(req.user)
   }
-  public admin=async (req:Request,res:Response)=>{
-    res.json((req as any).user)
+  public admin=async (req:AuthRequest,res:Response)=>{
+    res.json(req.user)
   }
   public getAllUsers=async (req:Request,res:Response)=>{
     try {

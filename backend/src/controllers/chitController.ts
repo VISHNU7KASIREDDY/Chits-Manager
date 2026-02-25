@@ -1,14 +1,15 @@
-import { Request,Response } from "express";
+import { Request, Response } from "express";
 import Chit from '../models/Chit'
 import Notification from "../models/Notification";
+import { AuthRequest } from "../utils/interfaces/authRequest.interface";
 
 class ChitController{
-  public getMyChits=async (req:Request,res:Response)=>{
+  public getMyChits=async (req:AuthRequest,res:Response)=>{
     try {
-      if (!(req as any).user) {
+      if (!req.user) {
         return res.status(401).json({ message: "Not authorized" });
       }
-      const id=(req as any).user._id
+      const id=req.user._id
       const chits=await Chit.find({members:id}).populate('months.winner', 'name phone')
       res.status(200).json(chits)
     } catch (error) {
@@ -33,12 +34,12 @@ class ChitController{
     }
   }
 
-  public participateInAuction = async (req: Request, res: Response) => {
+  public participateInAuction = async (req: AuthRequest, res: Response) => {
     try {
       const { id: chitId } = req.params
       const { monthNumber } = req.body
-      const userId = (req as any).user._id
-      const userName = (req as any).user.name
+      const userId = req.user._id
+      const userName = req.user.name
 
       const chit = await Chit.findById(chitId)
       if (!chit) return res.status(404).json({ message: "Chit not found" })

@@ -19,6 +19,8 @@ api.interceptors.response.use(
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login'
+    } else if (error.response?.status === 403 && error.response?.data?.message?.includes('Demo accounts cannot modify data')) {
+      window.alert('Action Restricted: Demo accounts cannot modify data.')
     }
     return Promise.reject(error)
   }

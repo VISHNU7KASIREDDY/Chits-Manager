@@ -15,7 +15,7 @@ class ChitRoutes implements Routes{
   private initializeRoutes(){
     this.router.get(this.path,this.authMiddleware.protect,this.chitController.getMyChits)
     this.router.get(`${this.path}/:id`,this.authMiddleware.protect,this.chitController.getChitById)
-    this.router.post(`${this.path}/:id/participate`,this.authMiddleware.protect,this.chitController.participateInAuction)
+    this.router.post(`${this.path}/:id/participate`,this.authMiddleware.protect,this.authMiddleware.demoGuard,this.chitController.participateInAuction)
   }
   
 }

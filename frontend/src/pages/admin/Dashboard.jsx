@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Header from '../../components/Header'
 import api from '../../services/api'
+import LoadingScreen from '../../components/LoadingScreen'
 import '../Dashboard.css'
 
 export default function AdminDashboard() {
@@ -136,7 +137,9 @@ export default function AdminDashboard() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: 'var(--slate-400)' }}>Loading...</td></tr>
+                  <tr><td colSpan="6" style={{ padding: '0' }}>
+                    <LoadingScreen fullScreen={false} message="Loading dashboard data" subMessage="Fetching users and chits..." />
+                  </td></tr>
                 ) : paginatedChits.length === 0 ? (
                   <tr><td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: 'var(--slate-400)' }}>No chit groups found.</td></tr>
                 ) : (

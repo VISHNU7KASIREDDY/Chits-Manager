@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 
-const LoadingScreen = () => {
+const LoadingScreen = ({ 
+  message = "Loading your dashboard", 
+  subMessage = "Fetching your details and portfolio", 
+  fullScreen = true 
+}) => {
   const [dots, setDots] = useState('')
 
   useEffect(() => {
@@ -16,7 +21,8 @@ const LoadingScreen = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100vh',
+      height: fullScreen ? '100vh' : '400px',
+      borderRadius: fullScreen ? '0' : 'var(--radius-2xl)',
       background: 'linear-gradient(145deg, #f8fafc 0%, #eef2f7 40%, #e8edf5 100%)',
       fontFamily: "'Manrope', 'Inter', sans-serif",
       gap: '28px',
@@ -111,7 +117,7 @@ const LoadingScreen = () => {
           margin: '0 0 8px 0',
           letterSpacing: '-0.3px'
         }}>
-          Loading your dashboard{dots}
+          {message}{dots}
         </h2>
         <p style={{
           color: '#94a3b8',
@@ -119,7 +125,7 @@ const LoadingScreen = () => {
           fontWeight: 500,
           margin: 0
         }}>
-          Fetching your details and portfolio
+          {subMessage}
         </p>
       </div>
 
@@ -162,6 +168,12 @@ const LoadingScreen = () => {
       `}</style>
     </div>
   )
+}
+
+LoadingScreen.propTypes = {
+  message: PropTypes.string,
+  subMessage: PropTypes.string,
+  fullScreen: PropTypes.bool
 }
 
 export default LoadingScreen

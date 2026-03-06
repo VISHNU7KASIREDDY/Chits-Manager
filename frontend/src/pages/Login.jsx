@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import LoadingScreen from '../components/LoadingScreen'
 import './Login.css'
 
 export default function Login() {
@@ -42,6 +43,20 @@ export default function Login() {
     } finally {
       setDemoLoading('')
     }
+  }
+
+  if (loading) {
+    return <LoadingScreen message="Signing in..." subMessage="Authenticating your credentials" fullScreen={true} />
+  }
+
+  if (demoLoading) {
+    return (
+      <LoadingScreen 
+        message="Preparing Demo" 
+        subMessage={demoLoading === 'admin' ? "Logging in as Administrator" : "Logging in as Member"} 
+        fullScreen={true} 
+      />
+    )
   }
 
   return (

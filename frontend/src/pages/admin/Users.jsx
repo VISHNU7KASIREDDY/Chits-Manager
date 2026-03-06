@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Header from '../../components/Header'
 import api from '../../services/api'
+import LoadingScreen from '../../components/LoadingScreen'
 import '../Dashboard.css'
 
 export default function AdminUsers() {
@@ -111,7 +112,9 @@ export default function AdminUsers() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: 'var(--slate-400)' }}>Loading users...</td></tr>
+                  <tr><td colSpan="5" style={{ padding: '0' }}>
+                    <LoadingScreen fullScreen={false} message="Loading users" subMessage="Fetching user directory..." />
+                  </td></tr>
                 ) : users.length === 0 ? (
                   <tr><td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: 'var(--slate-400)' }}>No users found.</td></tr>
                 ) : (

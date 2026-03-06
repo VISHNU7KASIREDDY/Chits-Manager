@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Header from '../../components/Header'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
+import LoadingScreen from '../../components/LoadingScreen'
 import '../Dashboard.css'
 
 export default function MyChits() {
@@ -49,7 +50,7 @@ export default function MyChits() {
 
       <div className="dashboard-content">
         {loading ? (
-          <div className="empty-state">Loading chits...</div>
+          <LoadingScreen fullScreen={false} message="Loading your chits" subMessage="Fetching group details..." />
         ) : chits.length === 0 ? (
           <div className="empty-state">
             <span className="material-icons-round" style={{ fontSize: '48px', color: 'var(--slate-300)', marginBottom: '16px' }}>layers</span>

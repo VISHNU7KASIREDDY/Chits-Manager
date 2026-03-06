@@ -4,6 +4,7 @@ import Header from '../../components/Header'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
 import Modal from '../../components/Modal'
+import LoadingScreen from '../../components/LoadingScreen'
 import emailjs from '@emailjs/browser'
 import '../Dashboard.css'
 
@@ -178,7 +179,7 @@ export default function MemberDashboard() {
 
           <div className="chits-grid">
             {loading ? (
-              <div className="empty-state">Loading chits...</div>
+              <LoadingScreen fullScreen={false} message="Loading dashboard" subMessage="Fetching your portfolio..." />
             ) : activeChits.length === 0 ? (
               <div className="empty-state">No active chits found. Join a group to get started.</div>
             ) : (

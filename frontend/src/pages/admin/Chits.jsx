@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Header from '../../components/Header'
 import api from '../../services/api'
+import LoadingScreen from '../../components/LoadingScreen'
 import '../Dashboard.css'
 
 export default function AdminChits() {
@@ -132,7 +133,9 @@ export default function AdminChits() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: 'var(--slate-400)' }}>Loading...</td></tr>
+                  <tr><td colSpan="7" style={{ padding: '0' }}>
+                    <LoadingScreen fullScreen={false} message="Loading chit groups" subMessage="Fetching active and pending groups..." />  
+                  </td></tr>
                 ) : chits.length === 0 ? (
                   <tr><td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: 'var(--slate-400)' }}>No chit groups. Create one to get started.</td></tr>
                 ) : (

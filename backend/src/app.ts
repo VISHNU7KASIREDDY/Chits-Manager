@@ -12,6 +12,7 @@ class App{
     this.app=express()
     this.port=process.env.PORT||3000
     this.initializeMiddlewares()
+    this.initializeHealthCheck()
     const allRoutes = [...routes, new NotificationRoutes()];
     this.initializeRoutes(allRoutes)
     this.connectDatabase()
@@ -31,6 +32,12 @@ class App{
   private initializeRoutes(routes:Routes[]){
     routes.forEach((route) => {
       this.app.use("/", route.router)
+    })
+  }
+
+  private initializeHealthCheck() {
+    this.app.get('/health', (_req, res) => {
+      res.status(200).json({ status: 'ok' })
     })
   }
 

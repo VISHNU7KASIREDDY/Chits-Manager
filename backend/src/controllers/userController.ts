@@ -1,5 +1,6 @@
 import { Request,Response } from "express";
 import User from '../models/User'
+import Chit from '../models/Chit'
 import jwt from "jsonwebtoken"
 import { AuthRequest } from "../utils/interfaces/authRequest.interface";
 
@@ -88,6 +89,72 @@ class UserController{
     }
   }
 
+  private seedDemoMemberData=async (userId:any)=>{
+    const existingChits=await Chit.find({members:userId})
+    if (existingChits.length>0) return
+
+    const now=new Date()
+
+    // Helper to generate month data with payments
+    const generateMonths=(count:number,memberId:any,monthlyAmount:number,chitValue:number)=>{
+      const months=[]
+      for (let i=1;i<=count;i++){
+        const auctionAmount=Math.round(chitValue-(chitValue*((Math.random()*0.08)+0.02)))
+        const bonusPerMember=Math.round((chitValue-auctionAmount)/20)
+        months.push({
+          monthNumber:i,
+          auctionAmount,
+          winner:memberId,
+          bonusPerMember,
+          finalChitAmount:auctionAmount,
+          auctionParticipants:[memberId],
+          payments:[{
+            member:memberId,
+            isPaid:i<=count-1,
+            paidDate:i<=count-1?new Date(now.getFullYear(),now.getMonth()-(count-i),15):undefined
+          }]
+        })
+      }
+      return months
+    }
+
+    const startDate1=new Date(now.getFullYear(),now.getMonth()-5,1)
+    const endDate1=new Date(startDate1)
+    endDate1.setMonth(endDate1.getMonth()+20)
+
+    await Chit.create({
+      name:"Gold Savings Group",
+      chitValue:500000,
+      monthlyAmount:25000,
+      totalMembers:20,
+      duration:20,
+      startDate:startDate1,
+      endDate:endDate1,
+      members:[userId],
+      months:generateMonths(5,userId,25000,500000),
+      liftedMembers:[],
+      status:"active"
+    })
+
+    const startDate2=new Date(now.getFullYear(),now.getMonth()-3,1)
+    const endDate2=new Date(startDate2)
+    endDate2.setMonth(endDate2.getMonth()+10)
+
+    await Chit.create({
+      name:"Silver Monthly Circle",
+      chitValue:200000,
+      monthlyAmount:20000,
+      totalMembers:10,
+      duration:10,
+      startDate:startDate2,
+      endDate:endDate2,
+      members:[userId],
+      months:generateMonths(3,userId,20000,200000),
+      liftedMembers:[],
+      status:"active"
+    })
+  }
+
   public demoLogin=async (req:Request,res:Response)=>{
     try {
       const {role}=req.body
@@ -111,6 +178,11 @@ class UserController{
           role:account.role
         })
         await user.save()
+      }
+
+      // Seed demo chit data for member role
+      if (role==='member'){
+        await this.seedDemoMemberData(user._id)
       }
 
       const payload={user:{id:user._id,role:user.role}}

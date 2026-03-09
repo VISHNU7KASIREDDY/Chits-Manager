@@ -14,9 +14,9 @@ class AdminUserRoutes implements Routes{
 
   initializeRoutes(){
     this.router.get(this.path,this.authMiddleware.protect,this.authMiddleware.admin,this.adminUserController.getAllUsers)
-    this.router.post(this.path,this.authMiddleware.protect,this.authMiddleware.admin,this.adminUserController.createUser)
-    this.router.put(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminUserController.editUser)
-    this.router.delete(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.adminUserController.deleteUser)
+    this.router.post(this.path,this.authMiddleware.protect,this.authMiddleware.admin,this.authMiddleware.demoGuard,this.adminUserController.createUser)
+    this.router.put(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.authMiddleware.demoGuard,this.adminUserController.editUser)
+    this.router.delete(`${this.path}:id`,this.authMiddleware.protect,this.authMiddleware.admin,this.authMiddleware.demoGuard,this.adminUserController.deleteUser)
   }
 }
 

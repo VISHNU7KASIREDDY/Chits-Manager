@@ -39,6 +39,15 @@ class AuthMiddleware{
       return res.status(403).json({message:'Not authorized as an admin'});
     }
   }
+
+  private static DEMO_PHONES=['0000000001','0000000002']
+
+  public demoGuard=async (req:AuthRequest,res:Response,next:NextFunction)=>{
+    if (req.user && AuthMiddleware.DEMO_PHONES.includes(req.user.phone)){
+      return res.status(403).json({message:'Demo accounts cannot modify data'})
+    }
+    next()
+  }
 }
 
 export default AuthMiddleware;

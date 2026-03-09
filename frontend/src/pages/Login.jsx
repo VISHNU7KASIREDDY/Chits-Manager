@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import api from '../services/api'
 import './Login.css'
 
 export default function Login() {
@@ -9,6 +10,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [demoLoading, setDemoLoading] = useState('')
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -23,6 +25,22 @@ export default function Login() {
       setError(err.response?.data?.message || 'Login failed')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDemoLogin = async (role) => {
+    setError('')
+    setDemoLoading(role)
+    try {
+      const res = await api.post('/demo-login', { role })
+      const { token, user } = res.data
+      localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(user))
+      window.location.href = user.role === 'admin' ? '/admin' : '/dashboard'
+    } catch (err) {
+      setError(err.response?.data?.message || 'Demo login failed')
+    } finally {
+      setDemoLoading('')
     }
   }
 
@@ -170,6 +188,31 @@ export default function Login() {
               {!loading && <span className="material-icons-round" style={{ fontSize: '20px' }}>arrow_forward</span>}
             </button>
           </form>
+
+          <div className="demo-divider">
+            <span className="demo-divider-line"></span>
+            <span className="demo-divider-text">Or try a demo</span>
+            <span className="demo-divider-line"></span>
+          </div>
+
+          <div className="demo-buttons">
+            <button
+              className="demo-btn demo-btn-member"
+              onClick={() => handleDemoLogin('member')}
+              disabled={!!demoLoading}
+            >
+              <span className="material-icons-round" style={{ fontSize: '20px' }}>person</span>
+              {demoLoading === 'member' ? 'Logging in...' : 'Login as Member'}
+            </button>
+            <button
+              className="demo-btn demo-btn-admin"
+              onClick={() => handleDemoLogin('admin')}
+              disabled={!!demoLoading}
+            >
+              <span className="material-icons-round" style={{ fontSize: '20px' }}>admin_panel_settings</span>
+              {demoLoading === 'admin' ? 'Logging in...' : 'Login as Admin'}
+            </button>
+          </div>
 
           <div className="auth-footer">
             <p>

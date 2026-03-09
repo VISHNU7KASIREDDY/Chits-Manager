@@ -14,6 +14,7 @@ class UserRoutes implements Routes{
   initializeRoutes(){
     this.router.post(`${this.path}register`,this.userController.register)
     this.router.post(`${this.path}login`,this.userController.login)
+    this.router.post(`${this.path}demo-login`,this.userController.demoLogin)
     this.router.get(`${this.path}profile`,this.authMiddleware.protect,this.userController.profile)
     this.router.get(`${this.path}admin`,this.authMiddleware.protect,this.authMiddleware.admin,this.userController.admin)
     this.router.get(`${this.path}admin/users/`,this.authMiddleware.protect,this.authMiddleware.admin,this.userController.getAllUsers)

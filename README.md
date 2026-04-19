@@ -101,15 +101,61 @@ VITE_API_URL=http://localhost:5000/api
 npm run dev
 ```
 
-## API Overview
+## API Documentation
 
-| Route Prefix             | Description                            |
-| ------------------------ | -------------------------------------- |
-| `/api/users`             | Auth (register, login, profile)        |
-| `/api/chits`             | Member chit views and details          |
-| `/api/admin/chits`       | Admin chit CRUD, auctions, payments    |
-| `/api/admin/users`       | Admin user management                  |
-| `/api/notifications`     | Send and fetch notifications           |
+### Auth & Users (`/`)
+
+| Method | Endpoint | URL Params | Request Body | Description |
+|---|---|---|---|---|
+| `POST` | `/register` | - | `name`, `phone`, `password` | Register a new user |
+| `POST` | `/login` | - | `phone`, `password` | Login user |
+| `POST` | `/demo-login` | - | `role` ('member' or 'admin') | Demo login |
+| `GET` | `/profile` | - | - | Get logged-in user profile (Protected) |
+| `GET` | `/admin` | - | - | Validate Admin profile (Protected, Admin) |
+
+### Admin Chits (`/admin/chits`)
+
+| Method | Endpoint | URL Params | Request Body | Description |
+|---|---|---|---|---|
+| `GET` | `/admin/chits/` | - | - | Get all chits |
+| `GET` | `/admin/chits/:id` | `id` (Chit ID) | - | Get specific chit details |
+| `POST` | `/admin/chits/` | - | `name`, `chitValue`, `monthlyAmount`, `totalMembers`, `duration`, `startDate`, `endDate` | Create a new chit group |
+| `PUT` | `/admin/chits/:id` | `id` (Chit ID) | *(Optional fields from Create)* | Update chit details |
+| `DELETE` | `/admin/chits/:id` | `id` (Chit ID) | - | Delete a chit completely |
+| `POST` | `/admin/chits/:id/members` | `id` (Chit ID) | `members` (Array of Member IDs), `slots` (Optional) | Add one or more members to chit |
+| `DELETE` | `/admin/chits/:id/members/:memberId` | `id`, `memberId` | - | Remove a single member slot from chit |
+| `POST` | `/admin/chits/:id/months` | `id` (Chit ID) | `monthNumber`, `auctionAmount`, `winner` | Record new auction (month) data |
+| `PUT` | `/admin/chits/:id/months` | `id` (Chit ID) | `monthNumber`, `auctionAmount` (Optional), `winner` (Optional) | Edit month/auction data |
+| `DELETE` | `/admin/chits/:id/months` | `id` (Chit ID) | `monthNumber` | Remove month data |
+| `PUT` | `/admin/chits/:id/months/payments` | `id` (Chit ID) | `monthNumber`, `memberId`, `isPaid`, `paymentIndex` (Optional) | Update individual member's payment status |
+| `PUT` | `/admin/chits/:id/months/payments/mark-all-paid` | `id` (Chit ID) | `monthNumber` | Mark all participants in a month as paid |
+| `PUT` | `/admin/chits/:id/lifted/:memberId` | `id`, `memberId` | - | Toggle member's "lifted" flag (won the auction) |
+| `POST` | `/admin/chits/:id/months/send-reminders` | `id` (Chit ID) | `monthNumber` | Send auction reminder notifications to all |
+
+### Admin Users (`/admin/users`)
+
+| Method | Endpoint | URL Params | Request Body | Description |
+|---|---|---|---|---|
+| `GET` | `/admin/users/` | - | - | Get all users |
+| `POST` | `/admin/users/` | - | `name`, `phone`, `password`, `role` | Create a new system user |
+| `PUT` | `/admin/users/:id` | `id` (User ID) | *(Optional fields from Create)* | Modify an existing user |
+| `DELETE` | `/admin/users/:id` | `id` (User ID) | - | Delete a user |
+
+### Member Chits (`/my-chits`)
+
+| Method | Endpoint | URL Params | Request Body | Description |
+|---|---|---|---|---|
+| `GET` | `/my-chits` | - | - | Retrieve all chits the logged-in member has joined |
+| `GET` | `/my-chits/:id` | `id` (Chit ID) | - | Get detailed breakdown of a specific joined chit |
+| `POST` | `/my-chits/:id/participate` | `id` (Chit ID) | `monthNumber` | Express interest in a specific auction to admin |
+
+### Notifications (`/notifications`)
+
+| Method | Endpoint | URL Params | Request Body | Description |
+|---|---|---|---|---|
+| `GET` | `/notifications` | - | - | Get list of user's notifications |
+| `GET` | `/notifications/unread-count` | - | - | Get count of unread notifications |
+| `PUT` | `/notifications/:id/read` | `id` (Notification ID) | - | Mark a specific notification as read |
 
 ## Default Credentials
 
